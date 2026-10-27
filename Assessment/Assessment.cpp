@@ -1,111 +1,94 @@
-// Online Shop Deal - Buy 5 items, get the cheapest one free
+// Online Shop Deal - buy 5 items, get the cheapest one free
 #include <iostream>
 #include <iomanip>
 #include <string>
 using namespace std;
-
-const int NUM_ITEMS = 5; // number of items in the deal
-
-// Function: asks for a price for one item and returns it (rejects invalid input)
-double readInput(int itemNum)
-{
-	double input;
-	cout << "Enter the price for item " << itemNum << ": "; // prices entered in pounds
-	while (!(cin >> input) || input < 0)
-	{
-		cin.clear();            // reset error state
-		cin.ignore(1000, '\n'); // discard bad input
-		cout << "Invalid price. Please enter a positive number: ";
-	}
-	cin.ignore(1000, '\n'); // clear rest of line before next getline
-	return input;
-}
 
 // Function: asks for the name of one item and returns it
 string readName(int itemNum)
 {
 	string name;
 	cout << "Enter the name of item " << itemNum << ": ";
-	getline(cin, name);
+	cin >> name;
 	return name;
 }
 
-// Procedure: fills the arrays with the names and prices of all items
+// Function: asks for the price of one item and returns it
+double readInput(int itemNum)
+{
+	double input;
+	cout << "Enter the price for item " << itemNum << ": ";
+	cin >> input;
+	return input;
+}
+
+// Procedure: gets the name and price of all 5 items
 void getItems(string names[], double prices[])
 {
-	for (int i = 0; i < NUM_ITEMS; i++)
+	for (int i = 0; i < 5; i++)
 	{
 		names[i] = readName(i + 1);
 		prices[i] = readInput(i + 1);
 	}
 }
 
-// Procedure: sorts items by price, highest to lowest (bubble sort)
+// Procedure: sorts the items by price, highest to lowest (bubble sort)
 void sortItems(string names[], double prices[])
 {
-	for (int pass = 0; pass < NUM_ITEMS - 1; pass++)
+	for (int pass = 0; pass < 4; pass++)
 	{
-		for (int i = 0; i < NUM_ITEMS - 1 - pass; i++)
+		for (int i = 0; i < 4; i++)
 		{
-			if (prices[i] < prices[i + 1]) // swap if next item is dearer
+			// if the next item costs more, swap them round
+			if (prices[i] < prices[i + 1])
 			{
 				swap(prices[i], prices[i + 1]);
-				swap(names[i], names[i + 1]); // keep names matched to prices
+				swap(names[i], names[i + 1]); // keep names with their prices
 			}
 		}
 	}
 }
 
-// Procedure: displays the items in their current (sorted) order
-void displayItems(const string names[], const double prices[])
+// Procedure: displays the items in order
+void displayItems(string names[], double prices[])
 {
-	cout << "\nItems sorted by price (highest to lowest):\n";
-	for (int i = 0; i < NUM_ITEMS; i++)
+	cout << "\nItems from highest to lowest price:\n";
+	for (int i = 0; i < 5; i++)
 	{
-		cout << i + 1 << ". " << left << setw(20) << names[i]
-			 << right << fixed << setprecision(2) << prices[i] << endl;
+		cout << names[i] << " - " << prices[i] << endl;
 	}
 }
 
-// Function: adds all prices together and returns the total
-double calculateSubtotal(const double prices[])
+// Function: adds up all prices except the cheapest (the last one after sorting)
+double calculateTotal(double prices[])
 {
 	double total = 0;
-	for (int i = 0; i < NUM_ITEMS; i++)
+	for (int i = 0; i < 4; i++)
 	{
-		total += prices[i];
+		total = total + prices[i];
 	}
 	return total;
 }
 
-// Function: returns total owed after removing the cheapest item
-// (the array is sorted, so the cheapest item is the last one)
-double calculateTotal(const double prices[])
+// Procedure: displays the total owed
+void displayTotal(double total)
 {
-	return calculateSubtotal(prices) - prices[NUM_ITEMS - 1];
-}
-
-// Procedure: displays the subtotal, discount and final amount owed
-void displayTotal(const string names[], const double prices[])
-{
-	cout << fixed << setprecision(2);
-	cout << "\nSubtotal:        " << calculateSubtotal(prices) << endl;
-	cout << "Free item:       " << names[NUM_ITEMS - 1]
-		 << " (-" << prices[NUM_ITEMS - 1] << ")" << endl;
-	cout << "Total owed:      " << calculateTotal(prices) << endl;
+	cout << "\nTotal owed: " << total << endl;
 }
 
 int main()
 {
-	string names[NUM_ITEMS];  // item names
-	double prices[NUM_ITEMS]; // item prices
+	string names[5];  // item names
+	double prices[5]; // item prices
+	double total;     // total owed
 
-	cout << "=== Buy 5, Get the Cheapest Free ===\n\n";
+	cout << fixed << setprecision(2); // show prices to 2 decimal places
 
-	getItems(names, prices);      // input
-	sortItems(names, prices);     // process: sort high to low
-	displayItems(names, prices);  // output: sorted list
-	displayTotal(names, prices);  // output: total owed
+	getItems(names, prices);
+	sortItems(names, prices);
+	displayItems(names, prices);
+	total = calculateTotal(prices);
+	displayTotal(total);
 
 	return 0;
 }
